@@ -96,6 +96,7 @@ export const LockDetails = ({ registryObjId, lockCap }: {
                     showEvents: true,
                 }
             });
+            console.log("Claim result:", claimResult);
             if (claimResult.effects?.status.status === "success") {
                 addToast({
                     color: "success",
