@@ -86,7 +86,7 @@ export const CreateLock = (params: {
     return (
         <Flex direction="column" gap="2">
             <Input label="Beneficiary" type="text" value={targetAccount} onValueChange={setTargetAccount} />
-            <NumberInput label="Expire Time" value={expireTime} onValueChange={setExpireTime} />
+            <NumberInput label="Expire Time (in ms)" value={expireTime} onValueChange={setExpireTime} />
             <NumberInput label="Amount (MIST)" value={amount} onValueChange={setAmount} />
             <Button onPress={handleCreateLock} isDisabled={registry === null || isLoading}>Create Lock</Button>
         </Flex>
