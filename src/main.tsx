@@ -8,6 +8,7 @@ import { createNetworkConfig, SuiClientProvider, WalletProvider } from '@mysten/
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { getFullnodeUrl } from '@mysten/sui/client'
 import { Theme } from '@radix-ui/themes';
+import { HeroUIProvider, ToastProvider } from '@heroui/react';
 
 const { networkConfig } = createNetworkConfig({
   localnet: { url: getFullnodeUrl('localnet') },
@@ -18,14 +19,17 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Theme>
-      <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-          <WalletProvider autoConnect={true}>
-            <App />
-          </WalletProvider>
-        </SuiClientProvider>
-      </QueryClientProvider>
-    </Theme>
+    <HeroUIProvider>
+      <ToastProvider />
+      <Theme>
+        <QueryClientProvider client={queryClient}>
+          <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+            <WalletProvider autoConnect={true}>
+              <App />
+            </WalletProvider>
+          </SuiClientProvider>
+        </QueryClientProvider>
+      </Theme>
+    </HeroUIProvider>
   </StrictMode>,
 )

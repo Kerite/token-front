@@ -3,7 +3,7 @@ import { Transaction } from "@mysten/sui/transactions";
 import { PACKAGE_ID } from "../constants";
 import { useState } from "react";
 import { Flex } from "@radix-ui/themes";
-import { Button, Input, NumberInput } from "@heroui/react";
+import { addToast, Button, Input, NumberInput } from "@heroui/react";
 
 export interface Registry {
     counter: string;
@@ -28,7 +28,8 @@ export const CreateLock = (params: {
     const { mutateAsync: execute } = useSignTransaction();
     const suiClient = useSuiClient();
     const [targetAccount, setTargetAccount] = useState<string>("");
-    const [expireTime, setExpireTime] = useState<number>(0);
+    const [expireTime, setExpireTime] = useState<number>(100_000);
+    const [amount, setAmount] = useState<number>(100_000);
 
     const handleCreateLock = async () => {
         if (isLoading) return;
@@ -42,7 +43,7 @@ export const CreateLock = (params: {
             }
             const tx = new Transaction();
             tx.setGasBudget(10000000);
-            const [coinToLock] = tx.splitCoins(tx.gas, [1]);
+            const [coinToLock] = tx.splitCoins(tx.gas, [amount]);
             const [, lockCap] = tx.moveCall({
                 target: `${PACKAGE_ID}::vault::create_lock`,
                 typeArguments: [
@@ -68,7 +69,13 @@ export const CreateLock = (params: {
                     showEvents: true,
                 }
             });
-            console.log("Transaction result:", resp);
+            console.log("Create lock transaction result:", resp);
+            if (resp.effects?.status.status === "success") {
+                addToast({
+                    color: "success",
+                    title: "Successfully created lock",
+                });
+            }
         } catch (error) {
             console.error("Error creating lock:", error);
         } finally {
@@ -80,6 +87,7 @@ export const CreateLock = (params: {
         <Flex direction="column" gap="2">
             <Input label="Beneficiary" type="text" value={targetAccount} onValueChange={setTargetAccount} />
             <NumberInput label="Expire Time" value={expireTime} onValueChange={setExpireTime} />
+            <NumberInput label="Amount (MIST)" value={amount} onValueChange={setAmount} />
             <Button onPress={handleCreateLock} isDisabled={registry === null || isLoading}>Create Lock</Button>
         </Flex>
     )

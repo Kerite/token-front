@@ -2,6 +2,7 @@ import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { useCallback, useEffect, useState } from "react"
 import { PACKAGE_ID } from "../constants";
 import { Select, SelectItem } from "@heroui/react";
+import { number } from "framer-motion";
 
 export interface LockCap {
     beneficiary: string;
@@ -37,7 +38,7 @@ export const LockCapList = ({
         setLockCaps(res.data.map((data): LockCap => {
             const content = data.data?.content as unknown as { fields: LockCap };
             return { ...content.fields };
-        }));
+        }).sort((a, b) => number.parse(a.lock_id) - number.parse(b.lock_id)));
     }, [currentAccount, suiClient]);
 
     useEffect(() => {
