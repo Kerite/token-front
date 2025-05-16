@@ -1,7 +1,7 @@
 import { useCurrentAccount, useSignTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { PACKAGE_ID } from "../constants";
-import { Button } from "@heroui/react";
+import { addToast, Button } from "@heroui/react";
 
 export default function CreateRegistry({
     isLoading,
@@ -46,8 +46,19 @@ export default function CreateRegistry({
                     showEffects: true,
                 }
             });
-            localStorage.setItem("registry", JSON.stringify(resp));
-            console.log("Transaction result:", resp);
+            if (resp?.effects?.status.status === "success") {
+                addToast({
+                    color: "success",
+                    title: "Registry created successfully",
+                });
+                console.log("Registry created successfully:", resp);
+            } else {
+                addToast({
+                    color: "danger",
+                    title: "Failed to create registry",
+                });
+                console.error("Failed to create registry:", resp?.effects?.status);
+            }
         } catch (error) {
             console.error("Error creating registry:", error);
         } finally {

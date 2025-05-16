@@ -4,7 +4,7 @@ import { Flex } from "@radix-ui/themes"
 import { useEffect, useState } from "react"
 import { PACKAGE_ID } from "../constants";
 import type { LockCap } from "./LockCapList";
-import { Button, Input } from "@heroui/react";
+import { addToast, Button, Input } from "@heroui/react";
 import { bcs } from "@mysten/sui/bcs";
 import { fromHex, toHex } from "@mysten/sui/utils";
 
@@ -96,7 +96,17 @@ export const LockDetails = ({ registryObjId, lockCap }: {
                     showEvents: true,
                 }
             });
-            console.log("Claim transaction result:", claimResult);
+            if (claimResult.effects?.status.status === "success") {
+                addToast({
+                    color: "success",
+                    title: "Successfully claimed tokens",
+                });
+            } else {
+                addToast({
+                    color: "danger",
+                    title: "Claim transaction failed",
+                });
+            }
         } finally {
             setIsLoading(false);
         }

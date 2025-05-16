@@ -69,12 +69,18 @@ export const CreateLock = (params: {
                     showEvents: true,
                 }
             });
-            console.log("Create lock transaction result:", resp);
             if (resp.effects?.status.status === "success") {
+                console.log("Lock created successfully:", resp);
                 addToast({
                     color: "success",
                     title: "Successfully created lock",
                 });
+            } else {
+                addToast({
+                    color: "danger",
+                    title: "Failed to create lock",
+                });
+                console.error("Failed to create lock:", resp);
             }
         } catch (error) {
             console.error("Error creating lock:", error);
