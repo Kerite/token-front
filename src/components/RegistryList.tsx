@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { PACKAGE_ID } from "../constants";
-import { useSuiClient, useCurrentAccount } from "@mysten/dapp-kit";
-import type { Registry } from "./CreateLock";
+import { REGISTRIES } from "../constants";
+import { useSuiClient } from "@mysten/dapp-kit";
+import type { Registry } from "./RegistryDetail";
 import { Select, SelectItem } from "@heroui/react";
 
 export const RegistryList = ({ setRegistry }: {
@@ -9,31 +9,26 @@ export const RegistryList = ({ setRegistry }: {
 }) => {
     const [registries, setRegistries] = useState<Registry[]>([]);
     const suiClient = useSuiClient();
-    const currentAccount = useCurrentAccount();
 
     const getRegistries = useCallback(async () => {
-        if (!currentAccount) {
-            return;
-        }
-        const res = await suiClient.getOwnedObjects({
-            owner: currentAccount?.address,
-            options: {
-                showContent: true,
-                showType: true,
-            },
-            filter: {
-                StructType: `${PACKAGE_ID}::vault::Registry<0x2::sui::SUI>`,
-            }
-        });
-        setRegistries(res.data.map((data): Registry => {
-            const content = data.data?.content as unknown as { fields: Registry };
+        const data = await Promise.all(REGISTRIES.map(async (registryId): Promise<Registry> => {
+            const res = await suiClient.getObject({
+                id: registryId,
+                options: {
+                    showContent: true,
+                    showType: true,
+                    showBcs: true,
+                }
+            });
+            const content = res.data?.content as unknown as { fields: Registry };
             return {
                 counter: content.fields.counter,
                 id: content.fields.id,
                 locks: content.fields.locks,
-            } as Registry;
+            }
         }));
-    }, [currentAccount, suiClient, setRegistries]);
+        setRegistries(data);
+    }, [suiClient, setRegistries]);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
